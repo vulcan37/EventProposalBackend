@@ -35,6 +35,7 @@ VendorSchema.methods.createJWT = function () {
     { vendorId: this._id, name: this.username, accountType: "Vendor" },
     process.env.JWT_SECRET,
     {
+      expiresIn: process.env.JWT_LIFETIME,
     }
   )
 }

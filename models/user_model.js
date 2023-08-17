@@ -40,6 +40,7 @@ UserSchema.methods.createJWT = function () {
         { userId: this._id, name: this.username, accountType: "User" },
         process.env.JWT_SECRET,
         {
+            expiresIn: process.env.JWT_LIFETIME,
         }
     )
 }
