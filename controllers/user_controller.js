@@ -16,33 +16,40 @@ const signup = async (req, res, next) => {
 }
 
 const signin = async (req, res) => {
-  const { email, password } = req.body
 
-  if (!email || !password) {
-    return res.status(400).json({ msg: "Fill all the Fields" })
-  }
-  const user = await User.findOne({ email })
-  if (!user) {
-    return res.status(400).json({
-      status: "Failed",
-      message: "User Not Found"
+  try {
+    const { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Fill all the Fields" })
+    }
+    const user = await User.findOne({ email })
+    if (!user) {
+      return res.status(400).json({
+        status: "Failed",
+        message: "User Not Found"
+      })
+    }
+    const isPasswordCorrect = await user.comparePassword(password)
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        status: "Failed",
+        message: "Wrong Password"
+      })
+    }
+    // compare password
+    const token = await user.createJWT()
+    res.status(400).json({
+      status: "Success",
+      token: token,
+      user: user
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'Failed',
+      message: error.message
     })
   }
-  const isPasswordCorrect = await user.comparePassword(password)
-  if (!isPasswordCorrect) {
-    res.status(401).json({
-      status: "Failed",
-      message: "Wrong Password"
-    })
-  }
-  // compare password
-  const token = user.createJWT()
-  res.status(400).json({
-    status: "Success",
-    token: token,
-    user: user
-  })
-
 }
 
 const addSelectedList = async (req, res) => {
